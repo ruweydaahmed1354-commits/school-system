@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <meta charset='UTF-8' />
+  <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+  <title>AL Suhaim University | Register</title>
+  <link rel='stylesheet' href='./register.css' />
+</head>
+<body>
+  <main class='auth'>
+    <section class='panel'>
+      <div class='branding'>
+        <img class='logo-img' src='../assets/magnific_3d-logo-for-alsuhaim-univ_mCTBzm9hJQ.png' alt='AL Suhaim University Logo' />
+        <h1 id='portalTitle'>Student Portal</h1>
+      </div>
+
+      <form id='registerForm'>
+        <label for='fullName'>Full Name</label>
+        <input id='fullName' required />
+
+        <label for='regEmail' id='identityLabel'>Email</label>
+        <input id='regEmail' type='text' required />
+
+        <label for='regPassword'>Password</label>
+        <div class='password-field'>
+          <input id='regPassword' type='password' required />
+          <button type='button' class='toggle-password' aria-label='Toggle password visibility'>
+            <span class='eye-icon' aria-hidden='true'>&#128065;</span>
+          </button>
+        </div>
+
+        <button type='submit'>Register</button>
+      </form>
+      <p id='msg'></p>
+      <p class='auth-switch'>Have an account? <a id='loginLink' href='./login.html'>Login</a></p>
+    </section>
+  </main>
+  <script src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'></script>
+  <script src='../assets/supabase-client.js'></script>
+  <script src='./register.js'></script>
+</body>
+</html>
