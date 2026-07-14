@@ -14,7 +14,10 @@ identityLabel.textContent = "Email address";
 identityInput.type = "email";
 
 if (selectedPortal !== "student") {
-  form.hidden = true;
+  // Some existing stylesheet rules override the HTML `hidden` attribute, so
+  // explicitly remove this form from the layout as well as disabling controls.
+  form.style.display = "none";
+  form.querySelectorAll("input, button").forEach((control) => (control.disabled = true));
   msg.textContent = "Staff and administrator accounts are created by an administrator. Please contact ICT support for an invitation.";
 }
 
