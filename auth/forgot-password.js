@@ -8,7 +8,7 @@ form?.addEventListener("submit", async (event) => {
   try {
     const client = await window.SchoolAuth.ready;
     const { error } = await client.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/login.html?portal=student`,
+      redirectTo: `${window.location.origin}/auth/reset-password.html`,
     });
     if (error) throw error;
     message.textContent = "If an account exists for this email, a password-reset link has been sent.";

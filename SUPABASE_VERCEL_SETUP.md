@@ -8,6 +8,7 @@
 4. Add these Redirect URLs:
    - `https://your-school.vercel.app/auth/login.html`
    - `https://your-school.vercel.app/auth/login.html?portal=student`
+   - `https://your-school.vercel.app/auth/reset-password.html`
    - `http://localhost:3000/auth/login.html` (only if you use a local server)
 5. Keep email confirmation enabled in **Authentication > Providers > Email** for production.
 
