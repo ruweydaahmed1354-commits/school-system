@@ -14,8 +14,11 @@ function localAccounts() {
   const accounts = JSON.parse(localStorage.getItem("umma_accounts") || "[]");
   if (!accounts.some((account) => account.role === "admin")) {
     accounts.push({ role: "admin", fullName: "Administrator", email: "admin@umma.edu", password: "admin123" });
-    localStorage.setItem("umma_accounts", JSON.stringify(accounts));
   }
+  if (!accounts.some((account) => account.role === "student")) {
+    accounts.push({ role: "student", fullName: "Demo Student", email: "student@umma.edu", password: "student123" });
+  }
+  localStorage.setItem("umma_accounts", JSON.stringify(accounts));
   return accounts;
 }
 
