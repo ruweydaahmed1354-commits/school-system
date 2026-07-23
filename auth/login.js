@@ -10,6 +10,15 @@ const routes = { admin: "../admin/dashboard.html", lecturer: "../lecturer/dashbo
 const params = new URLSearchParams(window.location.search);
 const selectedPortal = labels[params.get("portal")] ? params.get("portal") : "student";
 
+function localAccounts() {
+  const accounts = JSON.parse(localStorage.getItem("umma_accounts") || "[]");
+  if (!accounts.some((account) => account.role === "admin")) {
+    accounts.push({ role: "admin", fullName: "Administrator", email: "admin@umma.edu", password: "admin123" });
+    localStorage.setItem("umma_accounts", JSON.stringify(accounts));
+  }
+  return accounts;
+}
+
 portalTitle.textContent = labels[selectedPortal];
 registerLink.href = `./register.html?portal=${selectedPortal}`;
 localStorage.setItem("umma_selected_portal", selectedPortal);
@@ -24,22 +33,19 @@ form?.addEventListener("submit", async (event) => {
   const password = document.getElementById("password").value;
   if (!email || !password) return (errorEl.textContent = "Please provide your email and password.");
 
-  try {
-    const client = await window.SchoolAuth.ready;
-    const { data, error } = await client.auth.signInWithPassword({ email, password });
-    if (error) throw error;
-    const context = await window.SchoolAuth.sessionContext();
-    if (!context?.profile) throw new Error("Your account profile is not ready. Please contact an administrator.");
-    if (context.profile.role !== selectedPortal) {
-      await client.auth.signOut();
-      window.SchoolAuth.clearLegacySession();
-      throw new Error(`This account belongs to the ${context.profile.role} portal.`);
-    }
-    window.SchoolAuth.cacheProfile(context.profile);
-    window.location.assign(routes[selectedPortal]);
-  } catch (error) {
-    errorEl.textContent = error.message || "Unable to sign in. Please try again.";
+  const account = localAccounts().find((item) => item.email.toLowerCase() === email && item.password === password);
+  if (!account) {
+    errorEl.textContent = "Incorrect email or password.";
+    return;
   }
+  if (account.role !== selectedPortal) {
+    errorEl.textContent = `This account belongs to the ${account.role} portal.`;
+    return;
+  }
+  localStorage.setItem("umma_user_role", account.role);
+  localStorage.setItem("umma_user_name", account.email);
+  localStorage.setItem("umma_user_profile", JSON.stringify(account));
+  window.location.assign(routes[selectedPortal]);
 });
 
 document.querySelector(".toggle-password")?.addEventListener("click", () => {

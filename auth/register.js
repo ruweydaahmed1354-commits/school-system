@@ -13,15 +13,7 @@ loginLink.href = `./login.html?portal=${selectedPortal}`;
 identityLabel.textContent = "Email address";
 identityInput.type = "email";
 
-if (selectedPortal !== "student") {
-  // Some existing stylesheet rules override the HTML `hidden` attribute, so
-  // explicitly remove this form from the layout as well as disabling controls.
-  form.style.display = "none";
-  form.querySelectorAll("input, button").forEach((control) => (control.disabled = true));
-  msg.textContent = "Staff and administrator accounts are created by an administrator. Please contact ICT support for an invitation.";
-}
-
-form?.addEventListener("submit", async (event) => {
+form?.addEventListener("submit", (event) => {
   event.preventDefault();
   msg.textContent = "";
   const fullName = document.getElementById("fullName").value.trim();
@@ -30,19 +22,18 @@ form?.addEventListener("submit", async (event) => {
   if (!fullName || !email || !password) return (msg.textContent = "Please fill all required fields.");
   if (password.length < 8) return (msg.textContent = "Use a password of at least 8 characters.");
 
-  try {
-    const client = await window.SchoolAuth.ready;
-    const { error } = await client.auth.signUp({
-      email,
-      password,
-      options: { data: { full_name: fullName, role: "student" }, emailRedirectTo: `${window.location.origin}/auth/login.html?portal=student` },
-    });
-    if (error) throw error;
-    form.reset();
-    msg.textContent = "Account created. Check your email to confirm your account, then sign in.";
-  } catch (error) {
-    msg.textContent = error.message || "Unable to create your account.";
+  const accounts = JSON.parse(localStorage.getItem("umma_accounts") || "[]");
+  if (accounts.some((account) => account.email.toLowerCase() === email)) {
+    msg.textContent = "An account already exists with that email address.";
+    return;
   }
+  const account = { role: selectedPortal, fullName, email, password };
+  accounts.push(account);
+  localStorage.setItem("umma_accounts", JSON.stringify(accounts));
+  localStorage.setItem("umma_user_role", account.role);
+  localStorage.setItem("umma_user_name", account.email);
+  localStorage.setItem("umma_user_profile", JSON.stringify(account));
+  window.location.assign(`../${selectedPortal}/dashboard.html`);
 });
 
 document.querySelector(".toggle-password")?.addEventListener("click", () => {

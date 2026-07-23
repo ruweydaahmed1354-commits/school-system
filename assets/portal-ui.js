@@ -1,33 +1,18 @@
 (function () {
-  // All admin and lecturer pages include this file. Load Supabase before granting
-  // access; legacy localStorage is only a UI cache, never the source of authority.
+  // Temporary offline mode: use the local session created at login.
   const requiredRole = location.pathname.includes("/admin/") ? "admin" : location.pathname.includes("/lecturer/") ? "lecturer" : "";
   const assetBase = new URL(".", document.currentScript?.src || location.href);
-  if (requiredRole && !window.SchoolAuth) {
-    document.documentElement.style.visibility = "hidden";
-    const sdk = document.createElement("script");
-    sdk.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
-    sdk.onload = () => {
-      const clientScript = document.createElement("script");
-      clientScript.src = new URL("supabase-client.js", assetBase).href;
-      clientScript.onload = () => window.SchoolAuth.sessionContext().then((context) => {
-        if (!context || context.profile.role !== requiredRole) {
-          location.replace(`../auth/login.html?portal=${requiredRole}`);
-          return;
-        }
-        window.SchoolAuth.cacheProfile(context.profile);
-        document.documentElement.style.visibility = "";
-      }).catch(() => location.replace(`../auth/login.html?portal=${requiredRole}`));
-      document.head.appendChild(clientScript);
-    };
-    document.head.appendChild(sdk);
+  if (requiredRole && localStorage.getItem("umma_user_role") !== requiredRole) {
+    location.replace(`../auth/login.html?portal=${requiredRole}`);
+    return;
   }
 
   document.addEventListener("click", (event) => {
     const logout = event.target.closest(".logout");
     if (!logout) return;
     event.preventDefault();
-    Promise.resolve(window.SchoolAuth?.signOut()).finally(() => location.assign("../auth/login.html"));
+    ["umma_user_role", "umma_user_name", "umma_user_profile", "umma_lecturer_profile"].forEach((key) => localStorage.removeItem(key));
+    location.assign("../auth/login.html");
   });
   const app = document.querySelector(".app");
   const sidebar = document.querySelector(".sidebar");
